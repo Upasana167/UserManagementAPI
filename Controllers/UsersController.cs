@@ -69,7 +69,7 @@ public class UsersController : ControllerBase
         {
             if (Users.Any(existingUser => EmailsMatch(existingUser.Email, user.Email)))
             {
-                return BadRequest("A user with this email already exists.");
+                return Conflict("A user with this email already exists.");
             }
 
             user.Id = NextUserId++;
@@ -99,7 +99,7 @@ public class UsersController : ControllerBase
 
             if (Users.Any(existingUser => existingUser.Id != id && EmailsMatch(existingUser.Email, user.Email)))
             {
-                return BadRequest("A user with this email already exists.");
+                return Conflict("A user with this email already exists.");
             }
 
             Users[index] = user;
