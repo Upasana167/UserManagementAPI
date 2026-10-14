@@ -24,6 +24,7 @@ An ASP.NET Core Web API for TechHive Solutions to manage employee records for HR
 
 The API uses an in-memory list with sample records. Changes are not persisted after the application stops.
 `GET /api/users` accepts optional `page` and `pageSize` query parameters together; `pageSize` is limited to 100. Without them, the endpoint returns the full list for backward compatibility.
+All `/api/users` endpoints require a valid JWT bearer token.
 
 ### Validation and Responses
 
@@ -32,9 +33,23 @@ The API uses an in-memory list with sample records. Changes are not persisted af
 - `204 No Content` when a user is updated or deleted successfully.
 - `400 Bad Request` when model validation fails or the PUT route ID does not match the user ID in the request body.
 - `404 Not Found` when the requested user does not exist.
+- `401 Unauthorized` when the bearer token is missing, invalid, or expired.
+- `409 Conflict` when an email address is already used by another user.
 
 The user model requires a name, email, and department, and validates the email format. For PUT requests, the request body's `Id` must match the `{id}` in the URL.
 Names and departments are limited to 100 characters, and email addresses to 254 characters. Email addresses are trimmed and compared case-insensitively to reject duplicates.
+
+## JWT Authentication
+
+The nonsecret issuer and audience are configured in `appsettings.json` under `Authentication:Schemes:Bearer`. Do not put a signing key in a committed settings file. The .NET configuration system also accepts environment-variable overrides, using double underscores in place of colons (for example, `Authentication__Schemes__Bearer__ValidIssuer`).
+
+For local development, create a project-specific JWT with the .NET user-JWT tool:
+
+```powershell
+dotnet user-jwts create --issuer UserManagementAPI --audience UserManagementAPI.Client --valid-for 1h --output token
+```
+
+The tool stores its signing key in the developer's user-secrets store and writes the matching development issuer and audience settings to `appsettings.Development.json`. Use the printed token in Postman with Authorization type **Bearer Token**. For deployment, provide the signing key through a secret store or the `Authentication__Schemes__Bearer__SigningKeys__0__Value` environment variable, and override issuer and audience with environment variables as needed.
 
 ## How Copilot Assisted
 
