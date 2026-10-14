@@ -23,6 +23,7 @@ An ASP.NET Core Web API for TechHive Solutions to manage employee records for HR
 | DELETE | `/api/users/{id}` | Delete a user |
 
 The API uses an in-memory list with sample records. Changes are not persisted after the application stops.
+`GET /api/users` accepts optional `page` and `pageSize` query parameters together; `pageSize` is limited to 100. Without them, the endpoint returns the full list for backward compatibility.
 
 ### Validation and Responses
 
@@ -33,6 +34,7 @@ The API uses an in-memory list with sample records. Changes are not persisted af
 - `404 Not Found` when the requested user does not exist.
 
 The user model requires a name, email, and department, and validates the email format. For PUT requests, the request body's `Id` must match the `{id}` in the URL.
+Names and departments are limited to 100 characters, and email addresses to 254 characters. Email addresses are trimmed and compared case-insensitively to reject duplicates.
 
 ## How Copilot Assisted
 
